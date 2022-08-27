@@ -1,0 +1,10 @@
+name: ScoreBoardPlugin
+version: '${project.version}'
+main: info.ahaha.scoreboardplugin.ScoreBoardPlugin
+api-version: 1.17
+permissions:
+  scoreboardplugin.default:
+    default: true
+commands:
+  sb:
+    permission: scoreboardplugin.default
