@@ -19,8 +19,10 @@ public class Cmd implements CommandExecutor, TabCompleter {
             if (ScoreBoardPlugin.boards.containsKey(player.getUniqueId())){
                 ScoreBoardPlugin.boards.remove(player.getUniqueId());
                 player.setScoreboard(getServer().getScoreboardManager().getNewScoreboard());
+                ScoreBoardPlugin.playersData.update(player.getUniqueId(), false);
             }else {
                 ScoreBoardPlugin.boards.put(player.getUniqueId(), new ScoreBoardPlugin.ScoreBoards(player));
+                ScoreBoardPlugin.playersData.update(player.getUniqueId(), true);
             }
         }
         return true;
