@@ -17,6 +17,7 @@ public final class ScoreBoardPlugin extends JavaPlugin {
     public static ScoreBoardPlugin plugin;
     public static TPSMonitor monitor;
     public static Map<UUID, ScoreBoards> boards = new HashMap<>();
+    public static PlayersData playersData;
 
     @Override
     public void onEnable() {
@@ -25,8 +26,14 @@ public final class ScoreBoardPlugin extends JavaPlugin {
         monitor = new TPSMonitor();
         monitor.start(this);
 
+        getDataFolder().mkdir();
+        playersData = new PlayersData(getDataFolder());
+        playersData.load();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
-            new ScoreBoards(player);
+            if (playersData.isEnableSB(player.getUniqueId())) {
+                new ScoreBoards(player);
+            }
         }
 
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
