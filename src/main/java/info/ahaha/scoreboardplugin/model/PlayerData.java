@@ -4,10 +4,10 @@ import java.util.UUID;
 
 public class PlayerData {
     private UUID uuid;
-    private boolean enableSB;
+    private boolean enabled;
 
-    public boolean isEnableSB() {
-        return enableSB;
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public UUID getUuid() {
@@ -18,7 +18,7 @@ public class PlayerData {
         this.uuid = uuid;
     }
 
-    public void setEnableSB(boolean enableSB) {
-        this.enableSB = enableSB;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

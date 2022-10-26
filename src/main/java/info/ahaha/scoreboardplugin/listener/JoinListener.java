@@ -9,7 +9,7 @@ public class JoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
-        if (ScoreBoardPlugin.playersData.isEnableSB(e.getPlayer().getUniqueId())) {
+        if (ScoreBoardPlugin.playersData.isEnabled(e.getPlayer().getUniqueId())) {
             ScoreBoardPlugin.ScoreBoards scoreBoards = new ScoreBoardPlugin.ScoreBoards(e.getPlayer());
             scoreBoards.show(e.getPlayer());
         }

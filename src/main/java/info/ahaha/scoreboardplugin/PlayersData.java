@@ -44,19 +44,19 @@ public class PlayersData {
         }
     }
 
-    public void update(UUID uuid, boolean enableSB) {
+    public void update(UUID uuid, boolean enabled) {
         playerDataList.removeIf(data -> data.getUuid().equals(uuid));
 
         PlayerData newPlayerData = new PlayerData();
         newPlayerData.setUuid(uuid);
-        newPlayerData.setEnableSB(enableSB);
+        newPlayerData.setEnabled(enabled);
         playerDataList.add(newPlayerData);
 
         CompletableFuture.runAsync(this::save);
     }
 
-    public boolean isEnableSB(UUID uuid) {
+    public boolean isEnabled(UUID uuid) {
         Optional<PlayerData> playerData = playerDataList.stream().filter(data -> data.getUuid().equals(uuid)).findAny();
-        return !playerData.isPresent() || playerData.get().isEnableSB();
+        return !playerData.isPresent() || playerData.get().isEnabled();
     }
 }

@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.*;
 
 import java.util.*;
 
@@ -31,7 +29,7 @@ public final class ScoreBoardPlugin extends JavaPlugin {
         playersData.load();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (playersData.isEnableSB(player.getUniqueId())) {
+            if (playersData.isEnabled(player.getUniqueId())) {
                 new ScoreBoards(player);
             }
         }
