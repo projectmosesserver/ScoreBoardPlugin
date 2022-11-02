@@ -1,24 +1,25 @@
 package info.ahaha.scoreboardplugin.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class PlayerData {
-    private UUID uuid;
-    private boolean enabled;
+    @JsonProperty
+    private final UUID uuid;
+    @JsonProperty
+    private final boolean enabled;
 
-    public boolean isEnabled() {
-        return enabled;
+    public PlayerData(UUID uuid, boolean enabled) {
+        this.uuid = uuid;
+        this.enabled = enabled;
     }
 
     public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public boolean isEnabled() {
+        return enabled;
     }
 }

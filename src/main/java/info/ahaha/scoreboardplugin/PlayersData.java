@@ -47,9 +47,7 @@ public class PlayersData {
     public void update(UUID uuid, boolean enabled) {
         playerDataList.removeIf(data -> data.getUuid().equals(uuid));
 
-        PlayerData newPlayerData = new PlayerData();
-        newPlayerData.setUuid(uuid);
-        newPlayerData.setEnabled(enabled);
+        PlayerData newPlayerData = new PlayerData(uuid, enabled);
         playerDataList.add(newPlayerData);
 
         CompletableFuture.runAsync(this::save);
