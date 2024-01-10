@@ -1,14 +1,21 @@
 package info.ahaha.scoreboardplugin;
 
+import com.google.common.collect.Iterables;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import info.ahaha.scoreboardplugin.commands.Cmd;
 import info.ahaha.scoreboardplugin.listener.JoinListener;
+import info.ahaha.scoreboardplugin.listener.PluginMessageListener;
 import info.ahaha.scoreboardplugin.listener.QuitListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class ScoreBoardPlugin extends JavaPlugin {
 
@@ -16,11 +23,13 @@ public final class ScoreBoardPlugin extends JavaPlugin {
     public static TPSMonitor monitor;
     public static Map<UUID, ScoreBoards> boards = new HashMap<>();
     public static PlayersData playersData;
+    private Map<String, Integer> playerCounts = new HashMap<>();
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
+        saveDefaultConfig();
         monitor = new TPSMonitor();
         monitor.start(this);
 
@@ -28,10 +37,21 @@ public final class ScoreBoardPlugin extends JavaPlugin {
         playersData = new PlayersData(getDataFolder());
         playersData.load();
 
+        this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginMessageListener());
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (playersData.isEnabled(player.getUniqueId())) {
                 new ScoreBoards(player);
             }
+        }
+
+        if (Bukkit.getOnlinePlayers().size() != 0) {
+            FileConfiguration config = getConfig();
+            Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+            config.getStringList("Servers").forEach(s -> {
+                sendPlayerCountMessage(player, s);
+            });
         }
 
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
@@ -50,11 +70,25 @@ public final class ScoreBoardPlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
+    public void sendPlayerCountMessage(Player player, String server) {
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("PlayerCount");
+        out.writeUTF(server);
+        player.sendPluginMessage(this, "BungeeCord", out.toByteArray());
+    }
+
+    public void putPlayerCount(String server, int num) {
+        playerCounts.put(server, num);
+    }
+
     public static class ScoreBoards {
         public ScoreBoards(Player player) {
             boards.put(player.getUniqueId(), this);
             String name = player.getName();
-            String psize = String.valueOf(Bukkit.getOnlinePlayers().size());
+            int psize = 0;
+            for (int i : plugin.playerCounts.values()) {
+                psize += i;
+            }
             String tps = String.valueOf(Math.round(monitor.getTPS() * 100.0) / 100.0);
             double max = Runtime.getRuntime().maxMemory() / (double) (1024 * 1024);
             double used = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (double) (1024 * 1024);
@@ -135,7 +169,13 @@ public final class ScoreBoardPlugin extends JavaPlugin {
 
         @Override
         public void run() {
-            int psize = Bukkit.getOnlinePlayers().size();
+            if (Bukkit.getOnlinePlayers().size() == 0) return;
+            Player fp = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+            plugin.getConfig().getStringList("Servers").forEach(s -> plugin.sendPlayerCountMessage(fp, s));
+            int psize = 0;
+            for (int i : plugin.playerCounts.values()) {
+                psize += i;
+            }
             if (psize == 0) return;
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (boards.get(player.getUniqueId()) == null) continue;
